@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <title th:text="${title + ' | SecureVault'}">SecureVault</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+            rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <script>
+        // Theme initialization
+        (function () {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        })();
+    </script>
+</head>
+
+<body>
+<!-- Navbar Fragment -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg sticky-top py-3">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand d-flex align-items-center fw-bold" th:href="@{/dashboard}">
+            <i class="bi bi-shield-lock-fill text-premium-gradient me-2 fs-3"></i>
+            <span class="fs-4 ls-1">SecureVault</span>
+        </a>
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-2">
+                <li class="nav-item">
+                    <a class="nav-link px-3 rounded-pill d-flex align-items-center" th:href="@{/dashboard}">
+                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3 rounded-pill d-flex align-items-center" th:href="@{/vault}">
+                        <i class="bi bi-safe2 me-2"></i>Vault
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3 rounded-pill d-flex align-items-center" th:href="@{/generator}">
+                        <i class="bi bi-shield-plus me-2"></i>Generator
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3 rounded-pill d-flex align-items-center" th:href="@{/security/audit}">
+                        <i class="bi bi-shield-check me-2"></i>Security
+                    </a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-3">
+                <!-- Theme Toggle -->
+                <div class="form-check form-switch mb-0">
+                    <input class="form-check-input" type="checkbox" role="switch" id="globalThemeToggle"
+                           style="cursor: pointer;">
+                    <label class="form-check-label" for="globalThemeToggle">
+                        <i id="globalThemeIcon" class="bi bi-sun-fill text-warning"></i>
+                    </label>
+                </div>
+
+                <!-- User Dropdown -->
+                <div class="dropdown" sec:authorize="isAuthenticated()">
+                    <button
+                            class="btn btn-glass-shiny rounded-pill px-3 py-1 d-flex align-items-center border border-secondary border-opacity-25"
+                            type="button" data-bs-toggle="dropdown">
+                        <div class="user-avatar-icon me-2">
+                            <img src="https://i.pinimg.com/736x/db/a8/6f/dba86f36d8086ae994d1f87e94ea6307.jpg"
+                                 alt="Profile">
+                        </div>
+                        <span class="small fw-bold d-none d-sm-inline"
+                              th:text="${#authentication.name}">Username</span>
+                        <i class="bi bi-chevron-down ms-2 small"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end glass-card border-0 shadow-lg mt-2 p-2"
+                        style="min-width: 220px;">
+                        <li class="dropdown-header-profile mb-2">
+                            <div class="d-flex align-items-center px-2 py-1">
+                                <div class="user-avatar-icon me-3" style="width: 32px; height: 32px;">
+                                    <img src="https://i.pinimg.com/736x/db/a8/6f/dba86f36d8086ae994d1f87e94ea6307.jpg"
+                                         alt="Profile">
+                                </div>
+                                <div>
+                                    <div class="small fw-bold text-premium-gradient"
+                                         th:text="${#authentication.name}">Username</div>
+                                    <div class="opacity-50" style="font-size: 0.75rem;">Verified Operator</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li><a class="dropdown-item rounded-3 py-2 px-3" th:href="@{/profile}">
+                            <i class="bi bi-person-circle me-3 opacity-75"></i>My Profile</a></li>
+                        <li th:if="${user != null}">
+                            <a class="dropdown-item rounded-3 py-2 px-3" th:href="@{/security/2fa}">
+                                <i class="bi bi-shield-lock me-3 opacity-75"></i>
+                                <span th:text="${user.twoFactorEnabled ? '2FA: Disable' : '2FA: Enable'}">2FA
+                                        Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider opacity-10">
+                        </li>
+                        <li>
+                            <form th:action="@{/auth/logout}" method="post" class="m-0">
+                                <button type="submit"
+                                        class="dropdown-item rounded-3 py-2 px-3 text-danger d-flex align-items-center">
+                                    <i class="bi bi-box-arrow-right me-3 opacity-75"></i>Sign Out
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navbar theme toggle logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('globalThemeToggle');
+            const icon = document.getElementById('globalThemeIcon');
+            const html = document.documentElement;
+
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            toggle.checked = currentTheme === 'dark';
+            updateIcon(currentTheme);
+
+            toggle.addEventListener('change', () => {
+                const nextTheme = toggle.checked ? 'dark' : 'light';
+                html.setAttribute('data-bs-theme', nextTheme);
+                localStorage.setItem('theme', nextTheme);
+                updateIcon(nextTheme);
+
+                // Dispatch event for other pages
+                window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: nextTheme } }));
+            });
+
+            function updateIcon(theme) {
+                if (theme === 'dark') {
+                    icon.className = 'bi bi-moon-stars-fill text-danger';
+                } else {
+                    icon.className = 'bi bi-sun-fill text-warning';
+                }
+            }
+        });
+    </script>
+</nav>
+
+<!-- Footer Fragment -->
+<footer th:fragment="footer" class="py-4 mt-auto border-top border-secondary border-opacity-10">
+    <div class="container-fluid px-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-shield-check text-premium-gradient me-2 fs-5"></i>
+                <span class="small fw-medium opacity-75">© 2026 SecureVault. Enterprise-Grade Security.</span>
+            </div>
+            <div class="d-flex gap-4 small fw-bold opacity-50">
+                <a href="#" class="text-decoration-none text-body hover-primary">Privacy Policy</a>
+                <a href="#" class="text-decoration-none text-body hover-primary">Terms of Service</a>
+                <a href="#" class="text-decoration-none text-body hover-primary">Help Center</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+
+</html>

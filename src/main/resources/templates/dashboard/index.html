@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+
+<body class="d-flex flex-column min-vh-100 glass-bg">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="flex-grow-1 animate__animated animate__fadeIn">
+        <div class="container-fluid py-4 px-4">
+            <!-- Welcome Banner -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="glass-card mb-0 overflow-hidden"
+                        style="padding: 2.5rem; border-left: 5px solid var(--bs-primary) !important;">
+                        <div class="d-flex align-items-center justify-content-between position-relative"
+                            style="z-index: 2;">
+                            <div>
+                                <h3 class="fw-bold mb-2">
+                                    Welcome back, <span class="text-premium-gradient"
+                                        th:text="${user.firstName != null ? user.firstName : user.username}">User</span>!
+                                    👋</h3>
+                                <p class="mb-0 opacity-75 fs-5" style="max-width: 600px;">Your vault is secure and
+                                    protected
+                                    with
+                                    AES-256 encryption.
+                                </p>
+                            </div>
+                            <i class="bi bi-shield-lock-fill text-premium-gradient"
+                                style="font-size:6rem; opacity:0.15; position: absolute; right: -20px; top: -20px;"></i>
+                            <i class="bi bi-shield-lock-fill text-premium-gradient d-none d-md-block"
+                                style="font-size:4rem; opacity:0.8;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards (Elite Scifi "Metric Portals") -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <div class="metric-card-elite">
+                        <div class="d-flex justify-content-between align-items-start position-relative"
+                            style="z-index: 2;">
+                            <div>
+                                <p class="text-uppercase small fw-bold mb-3 opacity-50 ls-1" style="font-size: 0.7rem;">
+                                    Vault Capacity</p>
+                                <h2 class="metric-value-elite text-danger" th:text="${totalPasswords}">0</h2>
+                                <p class="small mt-2 mb-0 opacity-50">ENCRYPTED RECORDS</p>
+                            </div>
+                            <div class="metric-portal border-danger border-opacity-25 text-danger shadow-sm">
+                                <i class="bi bi-key-fill fs-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card-elite">
+                        <div class="d-flex justify-content-between align-items-start position-relative"
+                            style="z-index: 2;">
+                            <div>
+                                <p class="text-uppercase small fw-bold mb-3 opacity-50 ls-1" style="font-size: 0.7rem;">
+                                    High Priority</p>
+                                <h2 class="metric-value-elite text-warning" th:text="${favoriteCount}">0</h2>
+                                <p class="small mt-2 mb-0 opacity-50">FLAGGED VECTORS</p>
+                            </div>
+                            <div class="metric-portal border-warning border-opacity-25 text-warning shadow-sm">
+                                <i class="bi bi-star-fill fs-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card-elite">
+                        <div class="d-flex justify-content-between align-items-start position-relative"
+                            style="z-index: 2;">
+                            <div>
+                                <p class="text-uppercase small fw-bold mb-3 opacity-50 ls-1" style="font-size: 0.7rem;">
+                                    Weak Passwords</p>
+                                <h2 class="metric-value-elite text-success" th:text="${weakPasswordCount}">0</h2>
+                                <p class="small mt-2 mb-0 opacity-50">NEEDS REVIEW</p>
+                            </div>
+                            <div class="metric-portal border-success border-opacity-25 text-success shadow-sm">
+                                <i class="bi bi-shield-exclamation fs-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card-elite">
+                        <div class="d-flex justify-content-between align-items-start position-relative"
+                            style="z-index: 2;">
+                            <div>
+                                <p class="text-uppercase small fw-bold mb-3 opacity-50 ls-1" style="font-size: 0.7rem;">
+                                    Security Layer</p>
+                                <h2 class="metric-value-elite"
+                                    th:classappend="${user.twoFactorEnabled} ? 'text-info' : 'text-danger'">
+                                    <span th:text="${user.twoFactorEnabled} ? 'STABLE' : 'RISK'"></span>
+                                </h2>
+                                <p class="small mt-2 mb-0 opacity-75 d-flex align-items-center"
+                                    th:classappend="${user.twoFactorEnabled} ? 'text-info' : 'text-danger'">
+                                    <span class="status-led-elite led-pulse"
+                                        th:style="'background-color: ' + (${user.twoFactorEnabled} ? '#0dcaf0' : '#dc3545')"></span>
+                                    <span th:text="${user.twoFactorEnabled} ? '2FA ENCRYPTED' : '2FA DISABLED'"></span>
+                                </p>
+                            </div>
+                            <div class="metric-portal border-info border-opacity-25 shadow-sm"
+                                th:classappend="${user.twoFactorEnabled} ? 'text-info' : 'text-danger'">
+                                <i class="bi bi-shield-lock-fill fs-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="row g-4">
+                <!-- Sidebar: Quick Actions -->
+                <div class="col-lg-3">
+                    <div class="glass-card h-100 p-4">
+                        <h5 class="fw-bold mb-4 text-uppercase ls-2">
+                            <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Quick Actions
+                        </h5>
+                        <div class="d-grid gap-3">
+                            <a th:href="@{/vault/add}" class="btn btn-elite-scifi btn-elite-primary">
+                                <i class="bi bi-plus-circle me-3"></i>Add New
+                            </a>
+                            <a th:href="@{/generator}" class="btn btn-elite-scifi btn-elite-outline">
+                                <i class="bi bi-shuffle me-3"></i>Generate
+                            </a>
+                            <a th:href="@{/vault/favorites}" class="btn btn-elite-scifi btn-elite-outline">
+                                <i class="bi bi-star me-3"></i>Favorites
+                            </a>
+                            <a th:href="@{/security/audit}" class="btn btn-elite-scifi btn-elite-outline">
+                                <i class="bi bi-shield-exclamation me-3"></i>Audit
+                            </a>
+                            <a th:href="@{/vault}" class="btn btn-elite-scifi btn-elite-outline">
+                                <i class="bi bi-grid-3x3-gap me-3"></i>View All
+                            </a>
+                            <a th:href="@{/vault/export}" class="btn btn-elite-scifi btn-elite-outline">
+                                <i class="bi bi-arrow-left-right me-3"></i>Backup
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main: Recently Added -->
+                <div class="col-lg-9">
+                    <div class="glass-card h-100 p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold mb-0 text-uppercase ls-2">
+                                <i class="bi bi-clock-history me-2 text-primary"></i>Recently Added
+                            </h5>
+                            <a th:href="@{/vault}"
+                                class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-bold shadow-sm">
+                                View All <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+
+                        <div class="p-0">
+                            <div th:if="${#lists.isEmpty(recentEntries)}" class="text-center py-5">
+                                <i class="bi bi-inbox opacity-25 mb-3 text-muted" style="font-size:4rem"></i>
+                                <p class="small text-uppercase fw-bold opacity-50 ls-1">No passwords stored yet</p>
+                                <a th:href="@{/vault/add}"
+                                    class="btn btn-primary rounded-pill px-4 mt-3 fw-bold shadow-sm">Create First
+                                    Entry</a>
+                            </div>
+
+                            <div th:unless="${#lists.isEmpty(recentEntries)}" class="d-flex flex-column gap-3">
+                                <div th:each="entry : ${recentEntries}"
+                                    class="card glass-card border-0 shadow-sm hover-card">
+                                    <div
+                                        class="card-body p-3 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+
+                                        <!-- Account Details -->
+                                        <div class="d-flex align-items-center flex-grow-1 overflow-hidden"
+                                            style="min-width: 0;">
+                                            <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0 me-3 shadow-sm"
+                                                style="width: 45px; height: 45px;">
+                                                <i class="bi bi-globe text-primary fs-5"></i>
+                                            </div>
+                                            <div class="flex-grow-1 overflow-hidden">
+                                                <div class="d-flex align-items-center mb-1">
+                                                    <h6 class="fw-bold mb-0 text-truncate me-2"
+                                                        th:text="${entry.accountName}"></h6>
+                                                    <span th:if="${entry.favorite}" class="text-warning"><i
+                                                            class="bi bi-star-fill"></i></span>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3 text-muted small">
+                                                    <span class="text-truncate" style="max-width: 150px;">
+                                                        <i class="bi bi-person me-1"></i>
+                                                        <span
+                                                            th:text="${entry.usernameOrEmail != null && !entry.usernameOrEmail.isEmpty() ? entry.usernameOrEmail : 'N/A'}"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Category & Strength -->
+                                        <div class="d-flex flex-row align-items-center gap-4 px-md-3 border-start-md border-end-md border-secondary border-opacity-25"
+                                            style="min-width: 250px;">
+                                            <div class="d-flex flex-column" style="width: 90px;">
+                                                <span class="badge rounded-pill align-self-start fw-bold"
+                                                    th:text="${entry.category}"
+                                                    th:classappend="${entry.category.name() == 'BANKING'} ? ' bg-danger' : (${entry.category.name() == 'SOCIAL_MEDIA'} ? ' bg-info' : (${entry.category.name() == 'EMAIL'} ? ' bg-warning text-dark' : ' bg-secondary'))"></span>
+                                            </div>
+
+                                            <!-- Mini Strength Density Graph -->
+                                            <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <span class="fw-bold text-muted small"
+                                                        style="font-size: 0.65rem; letter-spacing: 0.5px;">STRENGTH
+                                                        DENSITY</span>
+                                                </div>
+                                                <div class="density-graph-container d-flex align-items-end gap-1"
+                                                    style="height: 18px;">
+                                                    <div th:each="i : ${#numbers.sequence(1, 12)}"
+                                                        class="density-bar rounded-top"
+                                                        th:style="|height: ${15 + (i * 7)}%;|"
+                                                        th:classappend="${(entry.id % 3 == 0) ? 'bg-primary filled' : ((entry.id % 2 == 0) ? (i <= 8 ? 'bg-primary filled' : 'bg-secondary empty') : (i <= 4 ? 'bg-danger filled-danger' : 'bg-secondary empty'))}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-md-auto">
+                                            <a th:href="@{/vault/view/{id}(id=${entry.id})}"
+                                                class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-bold shadow-sm">
+                                                <i class="bi bi-eye me-1"></i>View
+                                            </a>
+                                            <a th:href="@{/vault/edit/{id}(id=${entry.id})}"
+                                                class="btn btn-sm btn-outline-secondary rounded-circle icon-btn border-0 text-muted hover-dark-icon"
+                                                style="width: 32px; height: 32px; padding: 0; line-height: 30px; text-align: center;">
+                                                <i class="bi bi-pencil fs-6"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
